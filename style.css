@@ -1,0 +1,25 @@
+#container1 * {
+    margin: 10px;
+}
+
+#container2 * {
+    margin-left: 1000px;
+    margin-right: 10px;
+}
+
+.container {
+    text-align: right;
+    padding: 0px;
+}
+
+.column {
+    float: left;
+    width: 25%;
+    padding: 0px 16px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
