@@ -10,6 +10,7 @@
 .container {
     text-align: right;
     padding: 0px;
+    display: inline;
 }
 
 .column {
@@ -22,4 +23,20 @@
     content: "";
     display: table;
     clear: both;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+}
+
+td,
+th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.invis {
+    display: none;
 }
