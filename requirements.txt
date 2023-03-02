@@ -1,0 +1,6 @@
+gspread==5.7.2
+gspread_dataframe==3.3.0
+mysql_connector_repackaged==0.3.1
+pandas==1.5.3
+protobuf==4.22.0
+PyDrive==1.3.1
