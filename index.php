@@ -88,8 +88,6 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 <head>
     <script type="text/javascript" src="connection.js"></script>
     <link rel=" stylesheet " href="style.css ">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1108017234204244"
-     crossorigin="anonymous"></script>  
     <link rel="stylesheet " href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css " integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T " crossorigin="anonymous ">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -168,7 +166,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             </div>
             <br>
             <div style="padding: 10px, 0px " class="form-group">
-                <label for=" ">Neden İstendiği</label>
+                <label for=" ">Neden Istendigi</label>
                 <input type="text " class="form-control " value='<?php echo $reason; ?>' name="reason" id="reason" placeholder=" " aria-label=" " aria-describedby="basic-addon1 ">
             </div>
             <br>
@@ -186,8 +184,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             <div class="container ">
                 <div class="row form-group" style="justify-content: right; margin-right: 0px;">
-                <input type="reset" class="btn btn-danger ml-2" value="Reset">
-                    <input type="submit" class="btn btn-success ml-2" value="Submit">
+                    <input type="submit" class="btn btn-success" value="Submit">
+                    <input type="reset" class="btn btn-danger ml-2" value="Reset">
                 </div>
             </div>
 
