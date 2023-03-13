@@ -24,27 +24,9 @@ mycursor.execute("SELECT * FROM approvedRequests")
 
 approvedRequests = mycursor.fetchall()
 
-Items = []
-Counts = []
-Types = []
-Prices = []
-Totals = []
-Reasons = []
-Notes = []
-URLs = []
-Usernames = []
-Dates = []
-
-approvedItems = []
-approvedCounts = []
-approvedTypes = []
-approvedPrices = []
-approvedTotals = []
-approvedReasons = []
-approvedNotes = []
-approvedURLs = []
-approvedUsernames = []
-approvedDates = []
+Items, Counts, Types, Prices, Totals, Reasons, Notes, URLs, Usernames, Dates = ([] for i in range(10))
+ 
+approvedItems, approvedCounts, approvedTypes, approvedPrices, approvedTotals, approvedReasons, approvedNotes, approvedURLs, approvedUsernames, approvedDates = ([] for i in range(10))
 
 for i in requests:
     Items.append(i[0])
@@ -98,18 +80,20 @@ for i in approvedRequests:
 
 scopes = ['https://www.googleapis.com/auth/spreadsheets',
           'https://www.googleapis.com/auth/drive']
+try:
+    credentials = Credentials.from_service_account_file('gscred.json', scopes=scopes)
 
-credentials = Credentials.from_service_account_file('gscred.json', scopes=scopes)
+    gc = gspread.authorize(credentials)
 
-gc = gspread.authorize(credentials)
+    gauth = GoogleAuth()
+    drive = GoogleDrive(gauth)
 
-gauth = GoogleAuth()
-drive = GoogleDrive(gauth)
-
-# open a google sheet
-gs = gc.open_by_key('1BAeTfn2ws0qltt6rE2HH8cZMnhk12bDLMn7V1R1u4os')# select work sheet from name
-Requests = gs.worksheet('Requests')
-approvedRequests = gs.worksheet('Approved Requests')
+    # open a google sheet
+    gs = gc.open_by_key('1BAeTfn2ws0qltt6rE2HH8cZMnhk12bDLMn7V1R1u4os')# select work sheet from name
+    Requests = gs.worksheet('Requests')
+    approvedRequests = gs.worksheet('Approved Requests')
+except Exception:
+    raise Exception
 
 request = pd.DataFrame({'Item': Items, 'Count': Counts, 'Type': Types, 'Price': Prices, 'Total': Totals, 'Reason': Reasons, 'Notes': Notes, 'URL': URLs, 'Username': Usernames, 'Creation Date': Dates})# write to dataframe
 approvedRequest = pd.DataFrame({'Item': approvedItems, 'Count': approvedCounts, 'Type': approvedTypes, 'Price': approvedPrices, 'Total': approvedTotals, 'Reason': approvedReasons, 'Notes': approvedNotes, 'URL': approvedURLs, 'Username': approvedUsernames, 'Creation Date': approvedDates})# write to dataframe
