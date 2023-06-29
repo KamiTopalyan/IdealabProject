@@ -1,0 +1,13 @@
+.pageContainer {
+    padding: 32px 0;
+}
+
+.navbar {
+    background-color: #297fff;
+    opacity: 1;
+}
+
+.navbar button {
+    background-color: #00e09d;
+    margin-right: 20px;
+}
