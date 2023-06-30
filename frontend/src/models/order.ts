@@ -1,9 +1,10 @@
 export interface Order {
     _id: string,
+    user:string,
     name: string,
     price: Number,
     currency: "TL" | "USD" | "EURO" | "GPD",
-    countType: "piece" | "package", 
+    countType: "Piece" | "Package", 
     count: Number,
     reason?: String,
     url?: String,

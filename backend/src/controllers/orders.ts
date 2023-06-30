@@ -10,8 +10,9 @@ export const getOrders: RequestHandler = async (req, res, next) => {
 
     try {
         assertIsDefined(authenticatedUserId);
+        const user = await UserModel.findById(authenticatedUserId).exec();
 
-        const orders = await OrderModel.find({ userId: authenticatedUserId }).exec();
+        const orders = user?.isAdmin ? await OrderModel.find().exec() : await OrderModel.find({ userId: authenticatedUserId }).exec();
 
         res.status(200).json(orders);
     } catch (error) {
@@ -31,13 +32,13 @@ export const getOrder: RequestHandler = async (req, res, next) => {
         }
 
         const order = await OrderModel.findById(orderId).exec();
-
+        const user = await UserModel.findById(authenticatedUserId).exec();
 
         if (!order) {
             throw createHttpError(404, "order not found");
         }
 
-        if (!order.userId.equals(authenticatedUserId)) {
+        if (!order.userId.equals(authenticatedUserId) && !user?.isAdmin) {
             throw createHttpError(401, "You cannot access this order");
         }
 
@@ -49,6 +50,7 @@ export const getOrder: RequestHandler = async (req, res, next) => {
 };
 
 interface CreateOrderBody {
+    user: string,
     name: string,
     price: Number,
     currency: "TL" | "USD" | "EURO" | "GPD",
@@ -60,6 +62,7 @@ interface CreateOrderBody {
 }
 
 export const createOrder: RequestHandler<unknown, unknown, CreateOrderBody, unknown> = async (req, res, next) => {
+    const authenticatedUserId = req.session.userId;
     const name = req.body.name;
     const price = req.body.price;
     const currency = req.body.currency;
@@ -68,7 +71,7 @@ export const createOrder: RequestHandler<unknown, unknown, CreateOrderBody, unkn
     const reason = req.body.reason;
     const url = req.body.url;
     const notes = req.body.notes;
-    const authenticatedUserId = req.session.userId;
+
 
     try {
         assertIsDefined(authenticatedUserId);
@@ -76,7 +79,24 @@ export const createOrder: RequestHandler<unknown, unknown, CreateOrderBody, unkn
         if (!name) {
             throw createHttpError(400, "Order item must have a name");
         }
+        if (!price) {
+            throw createHttpError(400, "Order item must have a price");
+        }
+        if (!currency) {
+            throw createHttpError(400, "Order item must have a currency");
+        }
+        if (!countType) {
+            throw createHttpError(400, "Order item must have a count type");
+        }
+        if (!count) {
+            throw createHttpError(400, "Order item must have a count");
+        }
+
+        const user = await UserModel.findById(authenticatedUserId).exec();
+
         const neworder = OrderModel.create({
+            userId: authenticatedUserId,
+            user: user?.username,
             name: name,
             price: price,
             currency: currency,

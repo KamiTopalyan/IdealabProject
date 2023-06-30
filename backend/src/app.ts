@@ -8,13 +8,30 @@ import session from "express-session";
 import env from "./util/validateEnv";
 import MongoStore from "connect-mongo";
 import { requiresAuth } from "./middleware/auth";
+import bodyParser from "body-parser";
+import cors from "cors"
+import { allowedOrigins } from "./cors-option"
 
+const options: cors.CorsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+
+};
 
 const app = express();
 
 app.use(morgan("dev"));
 
 app.use(express.json());
+
+app.use(cors(options))
 
 app.use(session({
     secret: env.SESSION_SECRET,
@@ -36,7 +53,7 @@ app.use((req, res, next) => {
     console.log(next)
     next(createHttpError(404, "Endpoint not found"));
 });
-
+app.use(bodyParser.json());
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
     console.error(error);

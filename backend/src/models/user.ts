@@ -4,6 +4,7 @@ const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true, select: false },
     password: { type: String, required: true, select: false },
+    isAdmin: {type: Boolean, required: true, default: false}
 });
 
 type User = InferSchemaType<typeof userSchema>;

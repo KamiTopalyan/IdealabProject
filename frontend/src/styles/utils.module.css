@@ -14,7 +14,9 @@
 .width100 {
     width: 100%;
 }
-
+.seperateTop {
+    margin-top: 1rem;
+}
 .Row {
     display: flex;
     align-items: center;

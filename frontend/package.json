@@ -9,6 +9,7 @@
         "@types/jest": "^27.5.2",
         "@types/node": "^16.18.11",
         "@types/react": "^18.0.26",
+        "axios": "^1.4.0",
         "bootstrap": "^5.2.3",
         "crypto": "^1.0.1",
         "crypto-browserify": "^3.12.0",

@@ -1,9 +1,11 @@
 import app from "./app";
 import mongoose from "mongoose";
+import "dotenv/config";
+import env from "./util/validateEnv";
 
-const port = 5000;
+const port = env.PORT;
 
-mongoose.connect("mongodb://localhost:27017")
+mongoose.connect(env.MONGO_CONNECTION_STRING)
     .then(() => {
         console.log("Mongoose connected");
         app.listen(port, () => {

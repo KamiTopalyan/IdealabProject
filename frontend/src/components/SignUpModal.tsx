@@ -29,6 +29,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
             } else {
                 alert(error);
             }
+            console.error(error);
         }
     }
 

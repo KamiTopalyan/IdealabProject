@@ -2,8 +2,12 @@ import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Order } from "../models/order";
 import { User } from "../models/user";
 
+
+const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
+
 async function fetchData(input: RequestInfo, init?: RequestInit) {
-    const response = await fetch(input, init);
+    const response = await fetch(url + input, init);
+    
     if (response.ok) {
         return response;
     } else {

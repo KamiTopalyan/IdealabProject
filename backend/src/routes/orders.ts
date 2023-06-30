@@ -3,9 +3,9 @@ import * as orderController from "../controllers/orders";
 
 const router = express.Router();
 
-router.get("/", orderController.getOrder);
+router.get("/", orderController.getOrders);
 
-router.get("/:orderId", orderController.getOrders);
+router.get("/:orderId", orderController.getOrder);
 
 router.post("/", orderController.createOrder);
 

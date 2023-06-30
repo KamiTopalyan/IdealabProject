@@ -23,6 +23,7 @@ const LoginModal = ({ onDismiss, onLoginSuccessful }: LoginModalProps) => {
         try {
             const user = await OrdersApi.login(credentials);
             onLoginSuccessful(user);
+            window.location.reload();
         } catch (error) {
             if (error instanceof UnauthorizedError) {
                 setErrorText(error.message);

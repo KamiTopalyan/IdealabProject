@@ -5,6 +5,7 @@ import { Order as OrderModel } from '../models/order';
 import * as OrdersApi from "../network/orders_api";
 import styles from "../styles/Order.module.css";
 import styleUtils from "../styles/utils.module.css";
+import ViewOrderData from './ViewOrderData';
 import Order from './Order';
 
 const OrdersPageLoggedInView = () => {
@@ -14,7 +15,7 @@ const OrdersPageLoggedInView = () => {
     const [showOrdersLoadingError, setOrdersLoadingError] = useState(false);
 
     const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
-    const [orderToEdit, setOrderToEdit] = useState<OrderModel | null>(null);
+    const [orderToView, setOrderToView] = useState<OrderModel | null>(null);
 
     useEffect(() => {
         async function Orders() {
@@ -49,7 +50,10 @@ const OrdersPageLoggedInView = () => {
                 <div key={order._id}>
                     <Order
                         OrderModel={order}
-                        onOrderClicked={setOrderToEdit}
+                        onOrderClicked={() => {
+                            setOrderToView(order)
+                            setShowAddOrderDialog(true)
+                        }}
                         onDeleteOrderClicked={deleteOrder}
                     />
                 </div>
@@ -58,12 +62,6 @@ const OrdersPageLoggedInView = () => {
 
     return (
         <>
-            <Button
-                className={`mb-4 ${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
-                onClick={() => setShowAddOrderDialog(true)}>
-                <FaPlus />
-                Add new order
-            </Button>
             {ordersLoading && <Spinner animation='border' variant='primary' />}
             {showOrdersLoadingError && <p>Something went wrong. Please refresh the page.</p>}
             {!ordersLoading && !showOrdersLoadingError &&
@@ -73,6 +71,12 @@ const OrdersPageLoggedInView = () => {
                         : <p>You don't have any orders yet</p>
                     }
                 </>
+            }
+            {showAddOrderDialog &&
+                <ViewOrderData
+                    orderToView={orderToView}
+                    onDismiss={() => setShowAddOrderDialog(false)}
+                />
             }
         </>
     );
