@@ -7,7 +7,6 @@ import TextInputField from "./form/TextInputField";
 import styleUtils from "../styles/utils.module.css";
 import { useState } from 'react';
 import { UnauthorizedError } from "../errors/http_errors";
-
 interface LoginModalProps {
     onDismiss: () => void,
     onLoginSuccessful: (user: User) => void,
@@ -23,7 +22,7 @@ const LoginModal = ({ onDismiss, onLoginSuccessful }: LoginModalProps) => {
         try {
             const user = await OrdersApi.login(credentials);
             onLoginSuccessful(user);
-            window.location.reload();
+            window.location.reload()
         } catch (error) {
             if (error instanceof UnauthorizedError) {
                 setErrorText(error.message);

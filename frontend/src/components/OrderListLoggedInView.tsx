@@ -7,8 +7,12 @@ import styles from "../styles/Order.module.css";
 import styleUtils from "../styles/utils.module.css";
 import ViewOrderData from './ViewOrderData';
 import Order from './Order';
+import { User } from "../models/user";
+interface OrdersListPageProps {
+    loggedInUser: User | null,
+}
 
-const OrdersPageLoggedInView = () => {
+const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
 
     const [orders, setOrders] = useState<OrderModel[]>([]);
     const [ordersLoading, OrdersLoading] = useState(true);
@@ -74,6 +78,7 @@ const OrdersPageLoggedInView = () => {
             }
             {showAddOrderDialog &&
                 <ViewOrderData
+                    loggedInUser={loggedInUser}
                     orderToView={orderToView}
                     onDismiss={() => setShowAddOrderDialog(false)}
                 />

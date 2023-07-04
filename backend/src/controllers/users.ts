@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import UserModel from "../models/user";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     try {
@@ -12,11 +13,14 @@ export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     }
 };
 
+
 interface SignUpBody {
     username?: string,
     email?: string,
     password?: string,
 }
+
+
 
 export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = async (req, res, next) => {
     const username = req.body.username;
@@ -83,7 +87,9 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
         }
 
         req.session.userId = user._id;
-        res.status(201).json(user);
+
+        res.json({user});
+
     } catch (error) {
         next(error);
     }

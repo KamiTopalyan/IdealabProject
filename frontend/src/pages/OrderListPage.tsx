@@ -13,7 +13,7 @@ const OrdersListPage = ({ loggedInUser }: OrdersListPageProps) => {
         <Container className={styles.OrderListPage}>
             <>
                 {loggedInUser
-                    ? <OrderListLoggedInView />
+                    ? <OrderListLoggedInView loggedInUser={loggedInUser}/>
                     : <OrderListLoggedOutView />
                 }
             </>

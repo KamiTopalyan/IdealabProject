@@ -220,3 +220,40 @@ export const deleteOrder: RequestHandler = async (req, res, next) => {
         next(error);
     }
 };
+
+export const approveOrder: RequestHandler = async (req, res, next) => {
+    const orderId = req.params.orderId;
+    const authenticatedUserId = req.session.userId;
+
+    try{
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(orderId)) {
+            throw createHttpError(400, "Invalid order id");
+        }
+
+        const order = await OrderModel.findById(orderId).exec();
+
+        if (!order) {
+            throw createHttpError(404, "Order not found");
+        }
+
+        const user = await UserModel.findById(authenticatedUserId).exec();
+
+        if(!user) {
+            throw createHttpError(500, "User not authenticated");
+        }
+
+        if(!user.isAdmin) {
+            throw createHttpError(500, "User not authorized to alter order");
+        }
+
+        order.approved = true;
+
+        const approvedOrder = await order.save();
+
+        res.status(200).json(approvedOrder);
+    } catch(err) {
+
+    }
+}

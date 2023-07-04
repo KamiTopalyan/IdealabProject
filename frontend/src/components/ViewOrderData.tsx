@@ -1,13 +1,17 @@
 import { Button, Modal } from "react-bootstrap";
 import { Order } from "../models/order";
 import OrderStyle from "../styles/Order.module.css"
+import * as OrdersApi from "../network/orders_api";
+import checkIfAdmin from "../utils/checkIfAdmin";import { User } from "../models/user";
 interface orderToViewProps {
     orderToView: Order | null,
     onDismiss: () => void,
+    loggedInUser: User | null,
+    
 }   
 
-const ViewOrderData = ({ orderToView, onDismiss}: orderToViewProps) => {
-
+const ViewOrderData = ({ orderToView, onDismiss, loggedInUser}: orderToViewProps) => {
+    
     return (
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
@@ -25,6 +29,29 @@ const ViewOrderData = ({ orderToView, onDismiss}: orderToViewProps) => {
                 <p>Reason for request: {orderToView?.reason}</p>
                 <p>Extra Notes: {orderToView?.notes}</p>
             </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant="danger"
+                        onClick={() => {
+                            if(orderToView) {
+                                OrdersApi.deleteOrder(orderToView._id)
+                                onDismiss();
+                        }}}
+                >
+                    Delete
+                </Button>
+                {loggedInUser?.isAdmin &&
+                    <Button variant="success"
+                        onClick={() => {
+                            if(orderToView) {
+                                OrdersApi.approveOrder(orderToView._id)
+                                onDismiss();
+                            }}}
+                    >
+                        Approve
+                    </Button>
+                }
+            </Modal.Footer>
         </Modal>
     );
 }

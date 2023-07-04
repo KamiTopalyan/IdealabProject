@@ -11,3 +11,10 @@
     background-color: #ff4b4b;
     margin-right: 20px;
 }
+
+.navlink {
+    color: var(--bs-navbar-brand-hover-color);
+}
+.navlink:hover {
+    color: var(--bs-navbar-brand-hover-color);
+}

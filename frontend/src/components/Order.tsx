@@ -17,6 +17,7 @@ interface OrderProps {
 
 const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps) => {
     const {
+        user,
         name,
         price,
         currency,
@@ -48,7 +49,7 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                 <Row className={styleUtils.width100}>
                         <Col xs={3}>
                             <div className={styles.OrderText}>
-                                User: {name}
+                                User: {user}
                             </div>
                         </Col>
                         <Col xs={3}>

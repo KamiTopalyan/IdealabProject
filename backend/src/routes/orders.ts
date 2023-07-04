@@ -11,6 +11,8 @@ router.post("/", orderController.createOrder);
 
 router.patch("/:orderId", orderController.updateOrder);
 
+router.patch("/approveOrder/:orderId", orderController.approveOrder);
+
 router.delete("/:orderId", orderController.deleteOrder);
 
 export default router;

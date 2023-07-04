@@ -20,6 +20,9 @@ const NavBar = ({ loggedInUser, onSignUpClicked, onLoginClicked, onLogoutSuccess
                 <Navbar.Brand as={Link} to="/">
                     Order Manager
                 </Navbar.Brand>
+                <Nav.Link className={style.navlink} href="/orders">
+                    Order List
+                </Nav.Link>
                 <Navbar.Toggle aria-controls="main-navbar" />
                 <Navbar.Collapse id="main-navbar">
                     <Nav className="ms-auto">

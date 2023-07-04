@@ -11,6 +11,7 @@ const orderSchema = new Schema({
     reason: {type: String, default: ""},
     url: {type: String, default: ""},
     notes: {type: String, default: ""},
+    approved: {type: Boolean, default: false}
 }, { timestamps: true });
 
 type Order = InferSchemaType<typeof orderSchema>;

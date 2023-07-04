@@ -1,12 +1,12 @@
 import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Order } from "../models/order";
 import { User } from "../models/user";
-
+import axios from "axios"
 
 const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
-    const response = await fetch(url + input, init);
+    const response = await fetch(input, init);
     
     if (response.ok) {
         return response;
@@ -27,6 +27,7 @@ export async function getLoggedInUser(): Promise<User> {
     const response = await fetchData("/api/users", { method: "GET" });
     return response.json();
 }
+
 
 export interface SignUpCredentials {
     username: string,
@@ -52,15 +53,9 @@ export interface LoginCredentials {
 }
 
 export async function login(credentials: LoginCredentials): Promise<User> {
-    const response = await fetchData("/api/users/login",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(credentials),
-        });
-    return response.json();
+    const response = await axios.post("/api/users/login", {username: credentials.username, password: credentials.password});
+    localStorage.setItem("auth", response.data)
+    return response.data;
 }
 
 export async function logout() {
@@ -103,6 +98,17 @@ export async function updateOrder(orderId: string, order: OrderInput): Promise<O
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(order),
+        });
+    return response.json();
+}
+
+export async function approveOrder(orderId: string): Promise<Order> {
+    const response = await fetchData("/api/orders/approveOrder/" + orderId,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            }
         });
     return response.json();
 }
