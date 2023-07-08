@@ -9,6 +9,7 @@ export interface Order {
     reason?: String,
     url?: String,
     notes?: String,
+    approved: boolean,
     createdAt: string,
     updatedAt: string,
 }

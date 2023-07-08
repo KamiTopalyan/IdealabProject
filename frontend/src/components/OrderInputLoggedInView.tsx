@@ -1,15 +1,19 @@
-import { Button, Form, Modal, Row, Col } from "react-bootstrap";
-import { UseFormClearErrors, UseFormTrigger, useForm } from "react-hook-form";
-import { Order } from "../models/order";
+import { Button, Form, Row, Col } from "react-bootstrap";
+import { useForm } from "react-hook-form";
 import { OrderInput } from "../network/orders_api";
 import * as OrdersApi from "../network/orders_api";
 import TextInputField from "./form/TextInputField";
 import DropboxInputField from "./form/DropboxInputField";
+import { useState } from "react";
+import AlertBox from "./AlertBox"
 
 const OrdersInputLoggedInView = () => {
 
-    const { register, handleSubmit, formState: { errors, isSubmitting }, clearErrors} = useForm<OrderInput>();
+    const { register, handleSubmit, formState: { errors }} = useForm<OrderInput>();
 
+    const [showSuccessfulOrderAlert, setShowSuccessfulOrderAlert] = useState(false);
+    const [showFailedOrderAlert, setShowFailedOrderAlert] = useState(false);
+    
     async function onSubmit(input: OrderInput) {
         try {
             input = {
@@ -22,13 +26,21 @@ const OrdersInputLoggedInView = () => {
                 notes: input.notes
             }
             await OrdersApi.createOrder(input);
+            setShowSuccessfulOrderAlert(true)
+            setShowFailedOrderAlert(false)
         } catch (error) {
+            setShowFailedOrderAlert(true)
+            setShowSuccessfulOrderAlert(false)
             console.error(error);
             alert(error);
         }
+        
     }
 
     return (
+        <div>
+            {showSuccessfulOrderAlert && <AlertBox message="Added Order" header="Successful" onDismiss={() => setShowSuccessfulOrderAlert(false)} variant="success"/>}
+            {showFailedOrderAlert && <AlertBox message="Adding order failed" header="Failed" onDismiss={() => setShowFailedOrderAlert(false)} variant="danger"/>}
                 <Form id="addOrder" onSubmit={handleSubmit(onSubmit)} >
                     <Row >
                         <TextInputField
@@ -117,7 +129,7 @@ const OrdersInputLoggedInView = () => {
                         Submit
                     </Button>
                 </Form>
-                
+                </div>
     );
 }
 

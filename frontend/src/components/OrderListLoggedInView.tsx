@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button, Col, Row, Spinner } from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
+import {    Row, Spinner } from "react-bootstrap";
 import { Order as OrderModel } from '../models/order';
 import * as OrdersApi from "../network/orders_api";
 import styles from "../styles/Order.module.css";
-import styleUtils from "../styles/utils.module.css";
 import ViewOrderData from './ViewOrderData';
 import Order from './Order';
 import { User } from "../models/user";
@@ -19,7 +17,7 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
     const [showOrdersLoadingError, setOrdersLoadingError] = useState(false);
 
     const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
-    const [orderToView, setOrderToView] = useState<OrderModel | null>(null);
+    const [orderToView, setOrderToView] = useState<OrderModel>(orders[0]);
 
     useEffect(() => {
         async function Orders() {
@@ -42,6 +40,16 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
         try {
             await OrdersApi.deleteOrder(order._id);
             setOrders(orders.filter(existingOrder => existingOrder._id !== order._id));
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
+
+    async function approveOrder(order: OrderModel) {
+        try {
+            await OrdersApi.approveOrder(order._id);
+            setOrders(await OrdersApi.fetchOrders());
         } catch (error) {
             console.error(error);
             alert(error);
@@ -81,6 +89,8 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
                     loggedInUser={loggedInUser}
                     orderToView={orderToView}
                     onDismiss={() => setShowAddOrderDialog(false)}
+                    onDeleteOrderClicked={deleteOrder}
+                    onApproveOrderClicked={approveOrder}
                 />
             }
         </>

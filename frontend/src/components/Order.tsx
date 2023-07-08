@@ -1,12 +1,11 @@
 import styles from "../styles/Order.module.css";
 import styleUtils from "../styles/utils.module.css";
-import OrderStyles from "../styles/OrdersPage.module.css"
-import { Button, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Order as OrderModel } from "../models/order";
 import { MdDelete } from "react-icons/md";
-import { AiFillEdit, AiFillEye } from "react-icons/ai";
+import { AiFillEye } from "react-icons/ai";
 import { formatDate } from "../utils/formatDate";
 
 interface OrderProps {
@@ -18,14 +17,10 @@ interface OrderProps {
 const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps) => {
     const {
         user,
-        name,
         price,
         currency,
-        countType,
         count,
-        reason,
-        url,
-        notes,
+        approved,
         createdAt,
         updatedAt
     } = OrderModel;
@@ -34,10 +29,6 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
         createdUpdatedText = "Updated: " + formatDate(updatedAt);
     } else {
         createdUpdatedText = "Created: " + formatDate(createdAt);
-    }
-
-    function viewFull() {
-
     }
 
     return (
@@ -60,6 +51,11 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                         <Col xs={3}>
                             <div className={styles.OrderText}>
                                 Total Cost: {(count as number) * (price as number) + " " + currency}
+                                </div>
+                        </Col>
+                        <Col xs={3}>
+                            <div className={styles.OrderText}>
+                                Approved: {String(approved)}
                                 </div>
                         </Col>
                 </Row>

@@ -1,17 +1,18 @@
 import { Button, Modal } from "react-bootstrap";
 import { Order } from "../models/order";
 import OrderStyle from "../styles/Order.module.css"
-import * as OrdersApi from "../network/orders_api";
-import checkIfAdmin from "../utils/checkIfAdmin";import { User } from "../models/user";
+import { User } from "../models/user";
+import { Order as OrderModel } from "../models/order";
 interface orderToViewProps {
-    orderToView: Order | null,
+    orderToView: Order,
     onDismiss: () => void,
     loggedInUser: User | null,
-    
+    onDeleteOrderClicked: (Order: OrderModel) => void,
+    onApproveOrderClicked: (Order: OrderModel) => void,
 }   
 
-const ViewOrderData = ({ orderToView, onDismiss, loggedInUser}: orderToViewProps) => {
-    
+const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderClicked, onDeleteOrderClicked}: orderToViewProps) => {
+
     return (
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
@@ -32,21 +33,21 @@ const ViewOrderData = ({ orderToView, onDismiss, loggedInUser}: orderToViewProps
 
             <Modal.Footer>
                 <Button variant="danger"
-                        onClick={() => {
-                            if(orderToView) {
-                                OrdersApi.deleteOrder(orderToView._id)
-                                onDismiss();
-                        }}}
+                        onClick={(e) => {
+                            onDeleteOrderClicked(orderToView);
+                            e.stopPropagation();
+                            onDismiss()
+                        }}
                 >
                     Delete
                 </Button>
                 {loggedInUser?.isAdmin &&
                     <Button variant="success"
-                        onClick={() => {
-                            if(orderToView) {
-                                OrdersApi.approveOrder(orderToView._id)
-                                onDismiss();
-                            }}}
+                        onClick={(e) => {
+                            onApproveOrderClicked(orderToView);
+                            e.stopPropagation();
+                            onDismiss()
+                        }}
                     >
                         Approve
                     </Button>
