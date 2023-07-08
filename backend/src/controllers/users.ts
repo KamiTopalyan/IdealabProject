@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import UserModel from "../models/user";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     try {

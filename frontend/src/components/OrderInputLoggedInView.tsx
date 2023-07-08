@@ -60,7 +60,8 @@ const OrdersInputLoggedInView = () => {
                             <TextInputField
                                 name="count"
                                 label="Count"
-                                type="count"
+                                type="number"
+                                min="0"
                                 placeholder="Count"
                                 register={register}
                                 registerOptions={{ required: "Required" }}
@@ -84,7 +85,8 @@ const OrdersInputLoggedInView = () => {
                             <TextInputField
                                 name="price"
                                 label="Price"
-                                type="price"
+                                type="number"
+                                min="0"
                                 placeholder="Price"
                                 register={register}
                                 registerOptions={{ required: "Required" }}

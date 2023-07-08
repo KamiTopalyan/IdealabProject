@@ -44,12 +44,12 @@ function App() {
 				<Container className={styles.pageContainer}>
 					<Routes>
 						<Route
-							path='/orders'
-							element={<OrdersListPage loggedInUser={loggedInUser} />}
+							path='/input'
+							element={<OrderInputPage loggedInUser={loggedInUser} />}
 						/>
 						<Route
 							path='/'
-							element={<OrderInputPage loggedInUser={loggedInUser} />}
+							element={<OrdersListPage loggedInUser={loggedInUser} />}
 						/>
 						<Route
 							path='/*'
