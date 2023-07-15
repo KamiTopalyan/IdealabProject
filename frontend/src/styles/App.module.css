@@ -3,18 +3,36 @@
 }
 
 .navbar {
-    background-color: #297fff;
-    opacity: 1;
+    background-color: #a0b3c8;
+}
+
+.navbarText {
+    color: #112a44;
 }
 
 .navbar button {
-    background-color: #ff4b4b;
+    background-color: #486582;
+    border-radius: 20px;
     margin-right: 20px;
+    border-color: #486582;
+    color: #f0f4f7;
+}
+
+.navbar button:hover {
+    background-color: #486582;
+    border-color: #486582;
+}
+.navBrand {
+    color: #112a44;
+}
+
+.navBrand:hover {
+    color: rgb(61, 100, 146);
 }
 
 .navlink {
-    color: var(--bs-navbar-brand-hover-color);
+    color: #112a44;
 }
 .navlink:hover {
-    color: var(--bs-navbar-brand-hover-color);
+    color: rgb(61, 100, 146);
 }

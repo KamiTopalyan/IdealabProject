@@ -1,6 +1,6 @@
 const PasswordsPageLoggedOutView = () => {
     return (
-        <p>Please login to see your orders</p>
+        <p style={{color: "#a0b3c8"}}>Please login to see your orders</p>
     );
 }
 

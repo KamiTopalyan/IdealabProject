@@ -17,7 +17,7 @@ const NavBar = ({ loggedInUser, onSignUpClicked, onLoginClicked, onLogoutSuccess
     return (
         <Navbar className={style.navbar} variant="dark" expand="sm" sticky="top">
             <Container>
-                <Navbar.Brand as={Link} to="/">
+                <Navbar.Brand className={style.navBrand} as={Link} to="/">
                     Order Manager
                 </Navbar.Brand>
                 <Nav.Link className={style.navlink} href="/input">

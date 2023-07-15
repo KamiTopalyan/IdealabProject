@@ -60,11 +60,11 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                         </Col>
                 </Row>
                     <AiFillEye
-                        className="text-muted"
+                        className={styles.OrderFooterText}
                         onClick={() => onOrderClicked(OrderModel)}
                     />
                     <MdDelete
-                        className="text-muted ms-auto"
+                        className={`${styles.OrderFooterText} ms-auto`}
                         onClick={(e) => {
                             onDeleteOrderClicked(OrderModel);
                             e.stopPropagation();
@@ -75,7 +75,7 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                 
                     
             </Card.Body>
-            <Card.Footer className="text-muted">
+            <Card.Footer className={`text-muted ${styles.OrderFooterText}`} >
                 {createdUpdatedText}
             </Card.Footer>
         </Card>

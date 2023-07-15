@@ -18,9 +18,17 @@
 .OrderCard .col {
     line-height: 100rem;
 }
+.OrderCard {
+    background-color: #a0b3c8;
+    color: #112a44;
+}
 
 .OrderText {
     font-size: 24px;
+}
+
+.OrderFooterText {
+    color: #112a44 !important;
 }
 .column {
     float: left;
