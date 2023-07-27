@@ -24,9 +24,10 @@ const OrdersInputLoggedInView = () => {
                 count: (input.count as Number),
                 reason: input.reason,
                 notes: input.notes
-            }
+            } // Format input to match the type
             await OrdersApi.createOrder(input);
-            setShowSuccessfulOrderAlert(true)
+            // TODO: Make better boxes ideally using alert boxes
+            setShowSuccessfulOrderAlert(true) // popup box for info about order status (failed/successful)
             setShowFailedOrderAlert(false)
         } catch (error) {
             setShowFailedOrderAlert(true)
@@ -127,7 +128,7 @@ const OrdersInputLoggedInView = () => {
                                 register={register}
                         />
                     </Row>
-                    <Button variant="primary" type="submit">
+                    <Button  variant="primary" type="submit">
                         Submit
                     </Button>
                 </Form>

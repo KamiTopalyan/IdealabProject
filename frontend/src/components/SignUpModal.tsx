@@ -5,6 +5,7 @@ import * as OrdersApi from "../network/orders_api";
 import { Alert, Button, Form, Modal } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import styleUtils from "../styles/utils.module.css";
+import modalStyles from "../styles/modals.module.css";
 import { useState } from 'react';
 import { ConflictError } from "../errors/http_errors";
 
@@ -35,13 +36,13 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
 
     return (
         <Modal show onHide={onDismiss}>
-            <Modal.Header closeButton>
+            <Modal.Header className={`${modalStyles.modalBody}`} closeButton>
                 <Modal.Title>
                     Sign Up
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body>
+            <Modal.Body className={`${modalStyles.modalBody}`}>
                 {errorText &&
                     <Alert variant="danger">
                         {errorText}
@@ -76,9 +77,10 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
                         error={errors.password}
                     />
                     <Button
-                        type="submit"
+                        type="submit"   
+                        
                         disabled={isSubmitting}
-                        className={styleUtils.width100}>
+                        className={`${styleUtils.width100} ${modalStyles.modalButton}`}>
                         Sign Up
                     </Button>
                 </Form>

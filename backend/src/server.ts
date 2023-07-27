@@ -4,6 +4,7 @@ import "dotenv/config";
 import env from "./util/validateEnv";
 
 const port = env.PORT;
+mongoose.set('strictQuery', true);
 
 mongoose.connect(env.MONGO_CONNECTION_STRING)
     .then(() => {
@@ -13,3 +14,6 @@ mongoose.connect(env.MONGO_CONNECTION_STRING)
         });
     })
     .catch(console.error);
+
+    
+

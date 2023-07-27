@@ -1,8 +1,10 @@
 import { Button, Modal } from "react-bootstrap";
 import { Order } from "../models/order";
 import OrderStyle from "../styles/Order.module.css"
+import modalStyles from "../styles/modals.module.css"
 import { User } from "../models/user";
 import { Order as OrderModel } from "../models/order";
+
 interface orderToViewProps {
     orderToView: Order,
     onDismiss: () => void,
@@ -15,13 +17,13 @@ const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderCli
 
     return (
         <Modal show onHide={onDismiss}>
-            <Modal.Header closeButton>
+            <Modal.Header className={`${modalStyles.modalBody}`} closeButton>
                 <Modal.Title>
                     {orderToView?.user}'s request
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body className={OrderStyle.OrderText}>
+            <Modal.Body className={`${OrderStyle.OrderText} ${modalStyles.modalBody}`}>
                 <p>Item Requested: {orderToView?.name}</p>
                 <p>Count: {orderToView?.count.toString()}</p>
                 <p>Type of Count: {orderToView?.countType}</p>
@@ -31,8 +33,8 @@ const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderCli
                 <p>Extra Notes: {orderToView?.notes}</p>
             </Modal.Body>
 
-            <Modal.Footer>
-                <Button variant="danger"
+            <Modal.Footer className={`${modalStyles.modalBody}`}>
+                <Button className={modalStyles.modalButton}
                         onClick={(e) => {
                             onDeleteOrderClicked(orderToView);
                             e.stopPropagation();
@@ -42,7 +44,7 @@ const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderCli
                     Delete
                 </Button>
                 {loggedInUser?.isAdmin &&
-                    <Button variant="success"
+                    <Button className={modalStyles.modalButton}
                         onClick={(e) => {
                             onApproveOrderClicked(orderToView);
                             e.stopPropagation();

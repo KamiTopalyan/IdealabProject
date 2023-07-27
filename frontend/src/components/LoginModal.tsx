@@ -5,6 +5,7 @@ import * as OrdersApi from "../network/orders_api";
 import { Alert, Button, Form, Modal } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import styleUtils from "../styles/utils.module.css";
+import modalStyles from "../styles/modals.module.css";
 import { useState } from 'react';
 import { UnauthorizedError } from "../errors/http_errors";
 interface LoginModalProps {
@@ -35,13 +36,13 @@ const LoginModal = ({ onDismiss, onLoginSuccessful }: LoginModalProps) => {
 
     return (
         <Modal show onHide={onDismiss}>
-            <Modal.Header closeButton>
+            <Modal.Header className={`${modalStyles.modalBody}`} closeButton>
                 <Modal.Title>
                     Log In
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body>
+            <Modal.Body className={`${modalStyles.modalBody}`}>
                 {errorText &&
                     <Alert variant="danger">
                         {errorText}
@@ -69,7 +70,7 @@ const LoginModal = ({ onDismiss, onLoginSuccessful }: LoginModalProps) => {
                     <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className={styleUtils.width100}>
+                        className={`${styleUtils.width100} ${modalStyles.modalButton}`}>
                         Log In
                     </Button>
                 </Form>

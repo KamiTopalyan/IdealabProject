@@ -2,7 +2,7 @@
     "name": "backend",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/server.js",
+    "main": "src/server.ts",
     "scripts": {
         "start": "nodemon src/server.ts --ignore client",
         "lint": "eslint . --ext .ts",
