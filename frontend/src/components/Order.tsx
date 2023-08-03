@@ -16,11 +16,14 @@ interface OrderProps {
 
 const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps) => {
     const {
+        _id,
         user,
+        name,
         price,
         currency,
         count,
-        approved,
+        status,
+        id,
         createdAt,
         updatedAt
     } = OrderModel;
@@ -45,7 +48,7 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                         </Col>
                         <Col xs={3}>
                             <div className={styles.OrderText}>
-                                Item Requested: {price.toLocaleString()}
+                                Item Requested: {name}
                             </div>
                         </Col>
                         <Col xs={3}>
@@ -55,7 +58,7 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                         </Col>
                         <Col xs={3}>
                             <div className={styles.OrderText}>
-                                Approved: {String(approved)}
+                                Status: {String(status)}
                                 </div>
                         </Col>
                 </Row>
@@ -76,7 +79,8 @@ const Order = ({ OrderModel, onOrderClicked, onDeleteOrderClicked }: OrderProps)
                     
             </Card.Body>
             <Card.Footer className={`text-muted ${styles.OrderFooterText}`} >
-                {createdUpdatedText}
+                    <span>{createdUpdatedText}</span>
+                    <span className="ms-auto">Order id: #{_id}</span>
             </Card.Footer>
         </Card>
     )

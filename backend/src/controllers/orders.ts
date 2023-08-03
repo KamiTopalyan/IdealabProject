@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import OrderModel from "../models/order";
 import UserModel from "../models/user";
 import { assertIsDefined } from "../util/assertIsDefined";
+import { exec } from "child_process";
 
 export const getOrders: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.session.userId;
@@ -94,6 +95,9 @@ export const createOrder: RequestHandler<unknown, unknown, CreateOrderBody, unkn
 
         const user = await UserModel.findById(authenticatedUserId).exec();
 
+        //genearte a random number between 00000 and 99999 ansd store it in a variable named id and convert it to a string
+        const id = Math.floor(Math.random() * 100000).toString();
+
         const neworder = OrderModel.create({
             userId: authenticatedUserId,
             user: user?.username,
@@ -104,6 +108,7 @@ export const createOrder: RequestHandler<unknown, unknown, CreateOrderBody, unkn
             count: count,
             reason: reason,
             url: url,
+            id: id,
             notes: notes,
         }) 
 
@@ -126,6 +131,7 @@ interface UpdateOrderBody {
     reason: string,
     url: string,
     notes: string,
+    status: string;
 }
 
 export const updateOrder: RequestHandler<UpdateOrderParams, unknown, UpdateOrderBody, unknown> = async (req, res, next) => {
@@ -139,7 +145,7 @@ export const updateOrder: RequestHandler<UpdateOrderParams, unknown, UpdateOrder
     const newUrl = req.body.url;
     const newNotes = req.body.notes;
     const authenticatedUserId = req.session.userId;
-
+    
     try {
         assertIsDefined(authenticatedUserId);
 
@@ -165,6 +171,7 @@ export const updateOrder: RequestHandler<UpdateOrderParams, unknown, UpdateOrder
         if (!newCount) {
             throw createHttpError(400, "Order must have a count");
         }
+
 
         const order = await OrderModel.findById(orderId).exec();
 
@@ -248,12 +255,73 @@ export const approveOrder: RequestHandler = async (req, res, next) => {
             throw createHttpError(500, "User not authorized to alter order");
         }
 
-        order.approved = true;
+        order.status = "Approved";
 
         const approvedOrder = await order.save();
 
         res.status(200).json(approvedOrder);
-    } catch(err) {
+    } catch(error) {
+        next(error);
+    }
+}
 
+export const rejectOrder: RequestHandler = async (req, res, next) => {
+    const orderId = req.params.orderId;
+    const authenticatedUserId = req.session.userId;
+
+    try{
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(orderId)) {
+            throw createHttpError(400, "Invalid order id");
+        }
+
+        const order = await OrderModel.findById(orderId).exec();
+
+        if (!order) {
+            throw createHttpError(404, "Order not found");
+        }
+
+        const user = await UserModel.findById(authenticatedUserId).exec();
+
+        if(!user) {
+            throw createHttpError(500, "User not authenticated");
+        }
+
+        if(!user.isAdmin) {
+            throw createHttpError(500, "User not authorized to alter order");
+        }
+
+        order.status = "Rejected";
+
+        const approvedOrder = await order.save();
+
+        res.status(200).json(approvedOrder);
+    } catch(error) {
+        next(error);
+    }
+}
+
+export const downloadOrders: RequestHandler = async (req, res, next) => {
+    const authenticatedUserId = req.session.userId;
+
+    try{
+        assertIsDefined(authenticatedUserId);
+
+        const user = await UserModel.findById(authenticatedUserId).exec();
+
+        if(!user) {
+            throw createHttpError(500, "User not authenticated");
+        }
+
+        if(!user.isAdmin) {
+            throw createHttpError(500, "User not authorized to alter order");
+        }
+
+        exec('mongoexport --uri="mongodb+srv://kamitopalyan:Kamitopalyan06@cluster0.ednxyzu.mongodb.net/test" --collection=orders --out="/MERN Websites/idealab/Test/backend/src/CSV Exports/orders.csv" --type=csv --fields=user,name,price,currency,count,countType,reason,url,notes,status,id',{shell: '/bin/bash'});
+
+        res.status(200).json("File created");
+    } catch(error) {
+        next(error);
     }
 }

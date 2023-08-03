@@ -11,6 +11,8 @@ const orderSchema = new Schema({
     reason: {type: String, default: ""},
     url: {type: String, default: ""},
     notes: {type: String, default: ""},
+    status: {type: String, default: "Pending"},
+    id: {type: String, required: true, unique: true},
     approved: {type: Boolean, default: false}
 }, { timestamps: true });
 

@@ -23,6 +23,11 @@ async function fetchData(input: RequestInfo, init?: RequestInit) {
     }
 }
 
+export async function download() {
+    const response = await fetchData("/api/orders/download", { method: "GET" });
+    return response.status;
+}
+
 export async function getLoggedInUser(): Promise<User> {
     const response = await fetchData("/api/users", { method: "GET" });
     return response.json();
@@ -113,6 +118,18 @@ export async function approveOrder(orderId: string): Promise<Order> {
     return response.json();
 }
 
+export async function rejectOrder(orderId: string): Promise<Order> {
+    const response = await fetchData("/api/orders/rejectOrder/" + orderId,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+    return response.json();
+}
+
 export async function deleteOrder(orderId: string) {
     await fetchData("/api/orders/" + orderId, { method: "DELETE" });
 }
+

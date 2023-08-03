@@ -56,6 +56,16 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
         }
     }
 
+    async function rejectOrder(order: OrderModel) {
+        try {
+            await OrdersApi.rejectOrder(order._id);
+            setOrders(await OrdersApi.fetchOrders());
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
+
     const ordersGrid =
         <Row className={`g-4 ${styles.OrderListGrid}`}>
             {orders.map(order => (
@@ -91,6 +101,7 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
                     onDismiss={() => setShowAddOrderDialog(false)}
                     onDeleteOrderClicked={deleteOrder}
                     onApproveOrderClicked={approveOrder}
+                    onRejectOrderClicked={rejectOrder}
                 />
             }
         </>

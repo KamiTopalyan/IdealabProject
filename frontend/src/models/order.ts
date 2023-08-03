@@ -9,7 +9,8 @@ export interface Order {
     reason?: String,
     url?: String,
     notes?: String,
-    approved: boolean,
+    status: "Bought" | "Approved" | "Rejected",
+    id: String,
     createdAt: string,
     updatedAt: string,
 }

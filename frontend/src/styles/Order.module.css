@@ -30,6 +30,7 @@
 
 .OrderFooterText {
     color: #112a44 !important;
+    display: flex;
 }
 .column {
     float: left;

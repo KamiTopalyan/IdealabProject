@@ -11,9 +11,10 @@ interface orderToViewProps {
     loggedInUser: User | null,
     onDeleteOrderClicked: (Order: OrderModel) => void,
     onApproveOrderClicked: (Order: OrderModel) => void,
+    onRejectOrderClicked: (Order: OrderModel) => void,
 }   
 
-const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderClicked, onDeleteOrderClicked}: orderToViewProps) => {
+const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderClicked, onDeleteOrderClicked, onRejectOrderClicked}: orderToViewProps) => {
 
     return (
         <Modal show onHide={onDismiss}>
@@ -52,6 +53,17 @@ const ViewOrderData = ({ orderToView, onDismiss, loggedInUser, onApproveOrderCli
                         }}
                     >
                         Approve
+                    </Button>
+                }
+                {loggedInUser?.isAdmin &&
+                    <Button className={modalStyles.modalButton}
+                        onClick={(e) => {
+                            onRejectOrderClicked(orderToView);
+                            e.stopPropagation();
+                            onDismiss()
+                        }}
+                    >
+                        Reject
                     </Button>
                 }
             </Modal.Footer>
