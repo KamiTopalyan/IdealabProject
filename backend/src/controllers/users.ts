@@ -2,10 +2,13 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import UserModel from "../models/user";
 import bcrypt from "bcrypt";
+import { sign, verify } from "jsonwebtoken";
+import "dotenv/config";
+import env from "../util/validateEnv";
 
-export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
+export const getAuthenticatedUser: RequestHandler = async (req: any, res, next) => {
     try {
-        const user = await UserModel.findById(req.session.userId).select("+email").exec();
+        const user = await UserModel.findById(req.userId).select("+email").exec();
         res.status(200).json(user);
     } catch (error) {
         next(error);
@@ -51,8 +54,6 @@ export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
             password: passwordHashed,
         });
 
-        req.session.userId = newUser._id;
-
         res.status(201).json(newUser);
     } catch (error) {
         next(error);
@@ -65,6 +66,7 @@ interface LoginBody {
 }
 
 export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async (req, res, next) => {
+
     const username = req.body.username;
     const password = req.body.password;
 
@@ -85,21 +87,85 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
             throw createHttpError(401, "Invalid credentials");
         }
 
-        req.session.userId = user._id;
+    const accessToken = sign(
+        {
+            "UserInfo": {
+                "username": user.username,
+                "userId": user._id,
+            }
+        },
+        env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m' }
+    )
 
-        res.json({user});
+    const refreshToken = sign(
+        {
+            "UserInfo": {
+                "username": user.username,
+                "userId": user._id,
+            }
+        },
+        env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
+    )
+    // Create secure cookie with refresh token 
+    res.cookie('jwt-refresh', refreshToken, {
+        httpOnly: true, //works only in http
+        sameSite: 'strict', //cross-site cookie 
+        maxAge: 7 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
+    })
+
+
+    res.json({accessToken});
 
     } catch (error) {
         next(error);
     }
 };
 
-export const logout: RequestHandler = (req, res, next) => {
-    req.session.destroy(error => {
-        if (error) {
-            next(error);
-        } else {
-            res.sendStatus(200);
+export const refresh: RequestHandler = (req, res, next) => {
+    const cookies = req.cookies;
+
+    if (!cookies?.jwt) {
+        return res.status(401).json({ message: 'Invalid credentials' })
+    }
+
+    const refreshToken = cookies.jwt;
+
+    verify(
+        refreshToken,
+        env.REFRESH_TOKEN_SECRET,
+        async (err: any, decoded: any) => {
+            if(err) {
+                throw createHttpError(403, "Forbidden");
+            }
+
+            const user = await UserModel.findOne({ username: decoded.UserInfo.username }).exec();
+
+            if (!user) {
+                throw createHttpError(401, "Invalid credentials");
+            }
+
+            const accessToken = sign(
+                {
+                    "UserInfo": {
+                        "username": user.username,
+                        "userId": user._id,
+                    }
+                },
+                env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '15m' }
+            )
+
+            res.json({ accessToken })
+
         }
-    });
+    )
+}
+
+export const logout: RequestHandler = (req, res, next) => {
+    const cookies = req.cookies
+    if (!cookies?.jwt) return res.sendStatus(204) //No content
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'strict'})
+    res.json({ message: 'Cookie cleared' })
 };

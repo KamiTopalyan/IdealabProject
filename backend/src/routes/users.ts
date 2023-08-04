@@ -1,10 +1,12 @@
 import express from "express";
 import * as UserController from "../controllers/users";
-import { requiresAuth } from "../middleware/auth";
+import { verifyJWT } from "../middleware/auth";
 
 const router = express.Router();
 
-router.get("/", requiresAuth, UserController.getAuthenticatedUser);
+router.get("/", verifyJWT, UserController.getAuthenticatedUser);
+
+router.post("/refresh", UserController.refresh);
 
 router.post("/signup", UserController.signUp);
 

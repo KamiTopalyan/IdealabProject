@@ -7,9 +7,11 @@ import createHttpError, { isHttpError } from "http-errors";
 import session from "express-session";
 import env from "./util/validateEnv";
 import MongoStore from "connect-mongo";
-import { requiresAuth } from "./middleware/auth";
+import { verifyJWT } from "./middleware/auth";
 import bodyParser from "body-parser";
 import cors from "cors"
+import cookieParser from "cookie-parser"
+import path from "path"
 
 const options: cors.CorsOptions = {
     credentials: true,
@@ -24,38 +26,22 @@ app.use(express.json());
 
 app.use(cors(options))
 
-app.use(session({
-    secret: env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 60 * 60 * 1000,
-    },
-    rolling: true,
-    store: MongoStore.create({
-        mongoUrl: env.MONGO_CONNECTION_STRING
-    }),
-}));
+app.use(cookieParser())
+
+app.use('/', express.static(path.join(__dirname, 'public')))
 
 app.use("/api/users", userRoutes);
-app.use("/api/orders", requiresAuth, orderRoutes);
+app.use("/api/orders", verifyJWT, orderRoutes);
 
-app.use((req, res, next) => {
-    console.log(next)
-    next(createHttpError(404, "Endpoint not found"));
-});
-app.use(bodyParser.json());
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-    console.error(error);
-    let errorMessage = "An unknown error occurred";
-    let statusCode = 500;
-    if (isHttpError(error)) {
-        statusCode = error.status;
-        errorMessage = error.message;
+app.all('*', (req, res) => {
+    res.status(404)
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'))
+    } else if (req.accepts('json')) {
+        res.json({ message: '404 Not Found' })
+    } else {
+        res.type('txt').send('404 Not Found')
     }
-    res.status(statusCode).json({ error: errorMessage });
-});
+})
 
 export default app;
