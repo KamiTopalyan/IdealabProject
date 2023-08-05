@@ -20,6 +20,22 @@ function App() {
 	const [showLoginModal, setShowLoginModal] = useState(false);
 
 	useEffect(() => {
+		async function refreshToken() {
+
+			const jwtAccessCookie = document.cookie
+				.split(";")
+				.find((cookie) => cookie.includes("jwt-access"));
+
+			const jwtRefreshCookie = document.cookie
+				.split(";")
+				.find((cookie) => cookie.includes("jwt-refresh"));
+			
+
+			if (!jwtAccessCookie && jwtRefreshCookie) {
+				await UsersApi.refresh(jwtRefreshCookie);
+			}
+		}
+
 		async function fetchLoggedInUser() {
 			try {
 				const user = await UsersApi.getLoggedInUser();
@@ -28,6 +44,7 @@ function App() {
 				console.error(error);
 			}
 		}
+		refreshToken();
 		fetchLoggedInUser();
 	}, []);
 

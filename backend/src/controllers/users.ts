@@ -139,26 +139,25 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
 };
 
 export const refresh: RequestHandler = (req, res, next) => {
-    const cookies = req.cookies;
-    console.log(cookies.jwt)
-    if (!cookies?.jwt) {
+    const refreshToken = req.body.refreshCookie.split('=')[1];
+
+    if (!refreshToken) {
         return res.status(401).json({ message: 'Invalid credentials' })
     }
-
-    const refreshToken = cookies.jwt;
 
     verify(
         refreshToken,
         env.REFRESH_TOKEN_SECRET,
         async (err: any, decoded: any) => {
             if(err) {
-                throw createHttpError(403, "Forbidden");
+                console.log(err)
+                return res.status(403).json({ message: 'Forbidden' })
             }
 
             const user = await UserModel.findOne({ username: decoded.UserInfo.username }).exec();
 
             if (!user) {
-                throw createHttpError(401, "Invalid credentials");
+                return res.status(401).json({ message: 'Invalid credentials' })
             }
 
             const accessToken = sign(

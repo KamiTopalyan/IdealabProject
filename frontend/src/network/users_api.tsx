@@ -51,12 +51,16 @@ export async function signUp(credentials: SignUpCredentials): Promise<User> {
 
     let d1 = new Date();
     let d2 = new Date();
-    d1.setTime(d1.getTime() + 15 * 60 * 1000);
+    d1.setTime(d1.getTime() + 1000);
     d2.setTime(d2.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     //save data to a cookie
-    document.cookie = `jwt-access=${response.data.accessToken};expires=${d1.toUTCString()};path=/`;
-    document.cookie = `jwt-refresh=${response.data.refreshToken};expires=${d2.toUTCString()};path=/`;
+    document.cookie = `jwt-access=${
+      response.data.accessToken
+    };expires=${d1.toUTCString()};path=/;httpOnly:true`;
+    document.cookie = `jwt-refresh=${
+      response.data.refreshToken
+    };expires=${d2.toUTCString()};path=/;httpOnly:true`;
     
     return response.data;
 }
@@ -75,27 +79,43 @@ export async function login(credentials: LoginCredentials): Promise<User> {
     d2.setTime(d2.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     //save data to a cookie
-    document.cookie = `jwt-access=${response.data.accessToken};expires=${d1.toUTCString()};path=/`;
-    document.cookie = `jwt-refresh=${response.data.refreshToken};expires=${d2.toUTCString()};path=/`;
+    document.cookie = `jwt-access=${
+      response.data.accessToken
+    };expires=${d1.toUTCString()};path=/;httpOnly:true`;
+    document.cookie = `jwt-refresh=${
+      response.data.refreshToken
+    };expires=${d2.toUTCString()};path=/;httpOnly:true`;
 
     return response.data;
 }
 
-export async function refresh(credentials: LoginCredentials): Promise<User> {
-  const response = await fetchData("/api/users/refresh", "post", credentials);
+export async function refresh(cookie: string): Promise<User> {
+  const response = await fetchData("/api/users/refresh", "post", {
+    refreshCookie: cookie,
+  });
 
   let d1 = new Date();
   d1.setTime(d1.getTime() + 15 * 60 * 1000);
 
   //save data to a cookie
-  document.cookie = `jwt-access=${response.data.accessToken};expires=${d1.toUTCString()};path=/`;
+  document.cookie = `jwt-access=${response.data.accessToken};expires=${d1.toUTCString()};path=/;httpOnly:true`;
 
 
   return response.data;
 }
+
 export async function logout() {
-    //delete cookies
-    document.cookie = `;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+    //delete all cookies
+    document.cookie.split(";").forEach(function (c) {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(
+            /=.*/,
+            "=;expires=" +
+              new Date().toUTCString() +
+              ";path=/;httpOnly:true"
+          );
+    });
     
 }
 

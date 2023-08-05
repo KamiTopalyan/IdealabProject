@@ -1,10 +1,23 @@
 import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Order } from "../models/order";
+import { refresh } from "./users_api";
 import axios from "axios"
 
 const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
 
 async function fetchData(endpoint: RequestInfo, method: "post" | "get" | "patch" | "delete", data?: Object) {
+    const jwtAccessCookie = document.cookie
+        .split(";")
+        .find((cookie) => cookie.includes("jwt-access"));
+
+    const jwtRefreshCookie = document.cookie
+        .split(";")
+        .find((cookie) => cookie.includes("jwt-refresh"));
+
+    if (!jwtAccessCookie && jwtRefreshCookie) {
+        await refresh(jwtRefreshCookie)
+    }
+    
     const response = await axios({
       method: method,
       url: url + endpoint,
@@ -78,4 +91,5 @@ export async function rejectOrder(orderId: string): Promise<Order> {
 export async function deleteOrder(orderId: string) {
     await fetchData("/api/orders/" + orderId, "delete");
 }
+
 
