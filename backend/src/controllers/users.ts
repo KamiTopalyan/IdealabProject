@@ -6,9 +6,9 @@ import { sign, verify } from "jsonwebtoken";
 import "dotenv/config";
 import env from "../util/validateEnv";
 
-export const getAuthenticatedUser: RequestHandler = async (req: any, res, next) => {
+export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     try {
-        const user = await UserModel.findById(req.userId).select("+email").exec();
+        const user = await UserModel.findById(req.body.userId).select("+email").exec();
         res.status(200).json(user);
     } catch (error) {
         next(error);
@@ -54,7 +54,29 @@ export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
             password: passwordHashed,
         });
 
-        res.status(201).json(newUser);
+        const accessToken = sign(
+        {
+            "UserInfo": {
+                "username": newUser.username,
+                "userId": newUser._id,
+            }
+        },
+            env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        )
+
+        const refreshToken = sign(
+        {
+            "UserInfo": {
+                "username": newUser.username,
+                "userId": newUser._id,
+            }
+        },
+            env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        res.status(201).json({"accessToken": accessToken, "refreshToken": refreshToken});
     } catch (error) {
         next(error);
     }
@@ -108,15 +130,8 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
         env.REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
     )
-    // Create secure cookie with refresh token 
-    res.cookie('jwt-refresh', refreshToken, {
-        httpOnly: true, //works only in http
-        sameSite: 'strict', //cross-site cookie 
-        maxAge: 7 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
-    })
 
-
-    res.json({accessToken});
+    res.json({"accessToken": accessToken, "refreshToken": refreshToken});
 
     } catch (error) {
         next(error);
@@ -125,7 +140,7 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
 
 export const refresh: RequestHandler = (req, res, next) => {
     const cookies = req.cookies;
-
+    console.log(cookies.jwt)
     if (!cookies?.jwt) {
         return res.status(401).json({ message: 'Invalid credentials' })
     }
@@ -165,7 +180,12 @@ export const refresh: RequestHandler = (req, res, next) => {
 
 export const logout: RequestHandler = (req, res, next) => {
     const cookies = req.cookies
-    if (!cookies?.jwt) return res.sendStatus(204) //No content
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'strict'})
+    console.log(cookies)
+    if (!cookies?.jwt) {
+        throw createHttpError(400, "No tokens");
+    }
+    
+    res.clearCookie('jwt-refresh', { httpOnly: true, sameSite: 'none'})
+
     res.json({ message: 'Cookie cleared' })
 };

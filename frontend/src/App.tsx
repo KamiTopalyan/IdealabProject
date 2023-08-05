@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import LoginModal from './components/LoginModal';
 import NavBar from './components/NavBar';
 import { User } from './models/user';
-import * as OrdersApi from "./network/orders_api";
+import * as UsersApi from "./network/users_api";
 import OrdersListPage from './pages/OrderListPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OrderInputPage from './pages/OrderInputPage';
@@ -22,7 +22,7 @@ function App() {
 	useEffect(() => {
 		async function fetchLoggedInUser() {
 			try {
-				const user = await OrdersApi.getLoggedInUser();
+				const user = await UsersApi.getLoggedInUser();
 				setLoggedInUser(user);
 			} catch (error) {
 				console.error(error);

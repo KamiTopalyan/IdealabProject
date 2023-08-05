@@ -1,17 +1,28 @@
 import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Order } from "../models/order";
-import { User } from "../models/user";
 import axios from "axios"
 
 const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
 
-async function fetchData(input: RequestInfo, init?: RequestInit) {
-    const response = await fetch(input, init);
+async function fetchData(endpoint: RequestInfo, method: "post" | "get" | "patch" | "delete", data?: Object) {
+    const response = await axios({
+      method: method,
+      url: url + endpoint,
+      data: data,
+      headers: {
+        Authorization:
+          "Bearer " +
+          document.cookie
+            .split(";")
+            .find((cookie) => cookie.includes("jwt-access"))
+            ?.split("=")[1],
+      },
+    });
     
-    if (response.ok) {
+    if (response.status === 200 || response.status === 201) {
         return response;
     } else {
-        const errorBody = await response.json();
+        const errorBody = await response.data();
         const errorMessage = errorBody.error;
         if (response.status === 401) {
             throw new UnauthorizedError(errorMessage);
@@ -24,52 +35,13 @@ async function fetchData(input: RequestInfo, init?: RequestInit) {
 }
 
 export async function download() {
-    const response = await fetchData("/api/orders/download", { method: "GET" });
+    const response = await fetchData("/api/orders/download", "get");
     return response.status;
 }
 
-export async function getLoggedInUser(): Promise<User> {
-    const response = await fetchData("/api/users", { method: "GET" });
-    return response.json();
-}
-
-
-export interface SignUpCredentials {
-    username: string,
-    email: string,
-    password: string,
-}
-
-export async function signUp(credentials: SignUpCredentials): Promise<User> {
-    const response = await fetchData("/api/users/signup",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(credentials),
-        });
-    return response.json();
-}
-
-export interface LoginCredentials {
-    username: string,
-    password: string,
-}
-
-export async function login(credentials: LoginCredentials): Promise<User> {
-    const response = await axios.post("/api/users/login", {username: credentials.username, password: credentials.password});
-    localStorage.setItem("auth", response.data)
-    return response.data;
-}
-
-export async function logout() {
-    await fetchData("/api/users/logout", { method: "POST" });
-}
-
 export async function fetchOrders(): Promise<Order[]> {
-    const response = await fetchData("/api/orders", { method: "GET" });
-    return response.json();
+    const response = await fetchData("/api/orders", "get");
+    return response.data;
 }
 
 export interface OrderInput {
@@ -84,52 +56,26 @@ export interface OrderInput {
 }
 
 export async function createOrder(order: OrderInput): Promise<Order> {
-    const response = await fetchData("/api/orders",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(order),
-        });
-    return response.json();
+    const response = await fetchData("/api/orders", "post", order);
+    return response.data;
 }
 
 export async function updateOrder(orderId: string, order: OrderInput): Promise<Order> {
-    const response = await fetchData("/api/orders/" + orderId,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(order),
-        });
-    return response.json();
+    const response = await fetchData("/api/orders/" + orderId, "patch", order);
+    return response.data;
 }
 
 export async function approveOrder(orderId: string): Promise<Order> {
-    const response = await fetchData("/api/orders/approveOrder/" + orderId,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-    return response.json();
+    const response = await fetchData("/api/orders/approveOrder/" + orderId, "patch")
+    return response.data;
 }
 
 export async function rejectOrder(orderId: string): Promise<Order> {
-    const response = await fetchData("/api/orders/rejectOrder/" + orderId,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-    return response.json();
+    const response = await fetchData("/api/orders/rejectOrder/" + orderId, "patch");
+    return response.data;
 }
 
 export async function deleteOrder(orderId: string) {
-    await fetchData("/api/orders/" + orderId, { method: "DELETE" });
+    await fetchData("/api/orders/" + orderId, "delete");
 }
 

@@ -11,7 +11,7 @@ export const verifyJWT: RequestHandler = (req: any, res, next) => {
     if (!authHeader?.startsWith('Bearer ')) {
         throw createHttpError(401, "Unauthorized");
     }
-
+    
     const token = authHeader.split(' ')[1]
 
     verify(
@@ -21,8 +21,8 @@ export const verifyJWT: RequestHandler = (req: any, res, next) => {
             if (err) {
                 throw createHttpError(403, "Forbidden");
             }
-            req.username = decoded.UserInfo.username
-            req.userId = decoded.UserInfo.userId
+            req.body.username = decoded.UserInfo.username
+            req.body.userId = decoded.UserInfo.userId
             next()
         }
     )
