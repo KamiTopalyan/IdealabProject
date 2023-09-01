@@ -57,10 +57,10 @@ export async function signUp(credentials: SignUpCredentials): Promise<User> {
     //save data to a cookie
     document.cookie = `jwt-access=${
       response.data.accessToken
-    };expires=${d1.toUTCString()};path=/;httpOnly:true`;
+    };expires=${d1.toUTCString()};path=/`;
     document.cookie = `jwt-refresh=${
       response.data.refreshToken
-    };expires=${d2.toUTCString()};path=/;httpOnly:true`;
+    };expires=${d2.toUTCString()};path=/`;
     
     return response.data;
 }

@@ -1,4 +1,4 @@
-import { Button, Nav, Navbar } from "react-bootstrap";
+import { Button, Navbar } from "react-bootstrap";
 import { User } from "../models/user";
 import * as UsersApi from "../network/users_api";
 import style from "../styles/App.module.css"

@@ -3,15 +3,12 @@ import { useForm } from "react-hook-form";
 import { OrderDownloadFields } from "../network/orders_api";
 import * as OrdersApi from "../network/orders_api";
 import CheckboxInputField from "./form/CheckboxInputField";
-import { useState } from "react";
-import AlertBox from "./AlertBox"
 
 const OrdersInputLoggedInView = () => {
 
     const {
       register,
       handleSubmit,
-      formState: { errors },
     } = useForm<OrderDownloadFields>();
     
     async function onSubmit(input: OrderDownloadFields) {
@@ -19,9 +16,11 @@ const OrdersInputLoggedInView = () => {
         const response = await OrdersApi.download(input)
         
         if(response.status !== 200) {
-          return <AlertBox message="Failed to generate csv file" variant="danger" header="Error" onDismiss={function (): void {
-            throw new Error("Function not implemented.");
-          } } />
+          return alert("Generating CSV failed");
+        }
+
+        if(response.data === undefined || response.data === null || response.data === "") {
+          return alert("CSV data is empty");
         }
 
         const fileURL = window.URL.createObjectURL(new Blob([response.data]));
