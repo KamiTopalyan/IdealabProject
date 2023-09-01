@@ -92,7 +92,7 @@ export interface OrderDownloadFields {
   dates: Boolean;
 }
 
-export async function generate(fields: OrderDownloadFields): Promise<Number> {
+export async function download(fields: OrderDownloadFields): Promise<any> {
     const selectedFields = Object.entries(fields).map(([key, value]) => {
     if (value === true) {
         return key;
@@ -105,14 +105,8 @@ export async function generate(fields: OrderDownloadFields): Promise<Number> {
   if(selectedFields.includes("count")) {
     selectedFields.splice(selectedFields.indexOf("count")+1, 0,"countType");
   }
-  console.log("started generating")
-  const response = await fetchData("/api/orders/generate", "post", {fields: selectedFields.filter((it) => !!it)});
-  console.log("finished generating")
-  return response.status;
-}
 
-export async function download(): Promise<any> {
-  const response = await fetchData("/api/orders/download", "get");
+  const response = await fetchData("/api/orders/download", "post", {fields: selectedFields.filter((it) => !!it)});
   return response;
 }
 

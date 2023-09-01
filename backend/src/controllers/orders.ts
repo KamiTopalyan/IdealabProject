@@ -302,7 +302,7 @@ export const rejectOrder: RequestHandler = async (req, res, next) => {
     }
 }
 
-export const generateOrdersCSV: RequestHandler = async (req, res, next) => {
+export const downloadOrders: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.body.userId;
     const fields = req.body.fields;
     
@@ -321,35 +321,10 @@ export const generateOrdersCSV: RequestHandler = async (req, res, next) => {
         
         const orders: Order[] = user?.isAdmin ? await OrderModel.find().exec() : await OrderModel.find({ userId: authenticatedUserId }).exec();
         
-        createCVSFile(orders, fields);
+        const file = createCVSFile(orders, fields);
         
-        res.status(200)
-            .json({
-                message: "CSV file generated successfully"
-            });
+        res.status(200).download(file)
     } catch(error) {
         next(error);
     }
 }
-export const downloadOrdersCSV: RequestHandler = async (req, res, next) => {
-    const authenticatedUserId = req.body.userId;
-
-    try{
-        assertIsDefined(authenticatedUserId);
-
-        const user = await UserModel.findById(authenticatedUserId).exec();
-
-        if(!user) {
-            throw createHttpError(500, "User not authenticated");
-        }
-
-        if(!user.isAdmin) {
-            throw createHttpError(500, "User not authorized to download orders");
-        }
-        
-        res.status(200).download(path.join(__dirname, "..", "orders.csv"));
-    } catch(error) {
-        next(error);
-    }
-}
-

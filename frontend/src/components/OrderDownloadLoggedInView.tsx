@@ -16,9 +16,13 @@ const OrdersInputLoggedInView = () => {
     
     async function onSubmit(input: OrderDownloadFields) {
       try {
-        const generateStatus = await OrdersApi.generate(input)
-        console.log(generateStatus)
-        const response = await OrdersApi.download()
+        const response = await OrdersApi.download(input)
+        
+        if(response.status !== 200) {
+          return <AlertBox message="Failed to generate csv file" variant="danger" header="Error" onDismiss={function (): void {
+            throw new Error("Function not implemented.");
+          } } />
+        }
 
         const fileURL = window.URL.createObjectURL(new Blob([response.data]));
         const fileLink = document.createElement("a");
