@@ -16,6 +16,6 @@ const orderSchema = new Schema({
     approved: {type: Boolean, default: false}
 }, { timestamps: true });
 
-type Order = InferSchemaType<typeof orderSchema>;
+export type Order = InferSchemaType<typeof orderSchema>;
 
 export default model<Order>("Order", orderSchema);

@@ -18,27 +18,9 @@ const NavBarLoggedInView = ({ user, onLogoutSuccessful }: NavBarLoggedInViewProp
             alert(error);
         }
     }
- /*
-    async function download() {
-        try {
-            const status = await OrdersApi.download();
-            if (status === 200) {
-                window.open("/MERN Websites/idealab/Test/backend/src/CSV Exports/orders.csv");
-                return false;
-            } else {
-                alert("Download failed");
-            }
-        } catch (error) {
-            console.error(error);
-            alert(error);
-        }
-    }
-*/
-
 
     return (
         <>
-            {/* <Button onClick={download}>Download</Button> */}
             <Navbar.Text className={`me-2 ${style.navbarText}`}>
                 Signed in as: {user.username}
             </Navbar.Text>

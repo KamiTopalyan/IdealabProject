@@ -32,6 +32,7 @@
 
 .navlink {
     color: #112a44;
+    margin-right: 10px;
 }
 .navlink:hover {
     color: rgb(61, 100, 146);

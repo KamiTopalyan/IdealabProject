@@ -128,7 +128,7 @@ const OrdersInputLoggedInView = () => {
                                 register={register}
                         />
                     </Row>
-                    <Button  variant="primary" type="submit">
+                    <Button variant="primary" type="submit">
                         Submit
                     </Button>
                 </Form>

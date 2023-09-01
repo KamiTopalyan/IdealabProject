@@ -11,6 +11,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import OrderInputPage from './pages/OrderInputPage';
 import styles from "./styles/App.module.css";
 import SignUpModal from './components/SignUpModal';
+import OrderDownloadPage from './pages/OrderDownloadPage';
 
 function App() {
 
@@ -50,51 +51,52 @@ function App() {
 
 
 	return (
-		<BrowserRouter>
-			<div>
-				<NavBar
-					loggedInUser={loggedInUser}
-					onLoginClicked={() => setShowLoginModal(true)}
-					onSignUpClicked={() => setShowSignUpModal(true)}
-					onLogoutSuccessful={() => setLoggedInUser(null)}
-				/>
-				<Container className={styles.pageContainer}>
-					<Routes>
-						<Route
-							path='/input'
-							element={<OrderInputPage loggedInUser={loggedInUser} />}
-						/>
-						<Route
-							path='/'
-							element={<OrdersListPage loggedInUser={loggedInUser} />}
-						/>
-						<Route
-							path='/*'
-							element={<NotFoundPage />}
-						/>
-					</Routes>
-				</Container>
-				{showSignUpModal &&
-					<SignUpModal
-						onDismiss={() => setShowSignUpModal(false)}
-						onSignUpSuccessful={(user) => {
-							setLoggedInUser(user);
-							setShowSignUpModal(false);
-						}}
-					/>
-				}
-				{showLoginModal &&
-					<LoginModal
-						onDismiss={() => setShowLoginModal(false)}
-						onLoginSuccessful={(user) => {
-							setLoggedInUser(user);
-							setShowLoginModal(false);
-						}}
-					/>
-				}
-			</div>
-		</BrowserRouter>
-	);
+    <BrowserRouter>
+      <div>
+        <NavBar
+          loggedInUser={loggedInUser}
+          onLoginClicked={() => setShowLoginModal(true)}
+          onSignUpClicked={() => setShowSignUpModal(true)}
+          onLogoutSuccessful={() => setLoggedInUser(null)}
+        />
+        <Container className={styles.pageContainer}>
+          <Routes>
+            <Route
+              path="/input"
+              element={<OrderInputPage loggedInUser={loggedInUser} />}
+            />
+            <Route
+              path="/download"
+              element={<OrderDownloadPage loggedInUser={loggedInUser} />}
+            />
+            <Route
+              path="/"
+              element={<OrdersListPage loggedInUser={loggedInUser} />}
+            />
+            <Route path="/*" element={<NotFoundPage />} />
+          </Routes>
+        </Container>
+        {showSignUpModal && (
+          <SignUpModal
+            onDismiss={() => setShowSignUpModal(false)}
+            onSignUpSuccessful={(user) => {
+              setLoggedInUser(user);
+              setShowSignUpModal(false);
+            }}
+          />
+        )}
+        {showLoginModal && (
+          <LoginModal
+            onDismiss={() => setShowLoginModal(false)}
+            onLoginSuccessful={(user) => {
+              setLoggedInUser(user);
+              setShowLoginModal(false);
+            }}
+          />
+        )}
+      </div>
+    </BrowserRouter>
+  );
 }
 
 export default App;

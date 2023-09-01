@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
-import OrderModel from "../models/order";
+import OrderModel, { Order } from "../models/order";
 import UserModel from "../models/user";
 import { assertIsDefined } from "../util/assertIsDefined";
-import { exec } from "child_process";
-
+import createCVSFile from "../util/createCSVFile";
+import path from "path";
 export const getOrders: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.body.userId;
 
@@ -302,7 +302,36 @@ export const rejectOrder: RequestHandler = async (req, res, next) => {
     }
 }
 
-export const downloadOrders: RequestHandler = async (req, res, next) => {
+export const generateOrdersCSV: RequestHandler = async (req, res, next) => {
+    const authenticatedUserId = req.body.userId;
+    const fields = req.body.fields;
+    
+    try{
+        assertIsDefined(authenticatedUserId);
+
+        const user = await UserModel.findById(authenticatedUserId).exec();
+
+        if(!user) {
+            throw createHttpError(500, "User not authenticated");
+        }
+
+        if(!user.isAdmin) {
+            throw createHttpError(500, "User not authorized to download orders");
+        }
+        
+        const orders: Order[] = user?.isAdmin ? await OrderModel.find().exec() : await OrderModel.find({ userId: authenticatedUserId }).exec();
+        
+        createCVSFile(orders, fields);
+        
+        res.status(200)
+            .json({
+                message: "CSV file generated successfully"
+            });
+    } catch(error) {
+        next(error);
+    }
+}
+export const downloadOrdersCSV: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.body.userId;
 
     try{
@@ -315,13 +344,12 @@ export const downloadOrders: RequestHandler = async (req, res, next) => {
         }
 
         if(!user.isAdmin) {
-            throw createHttpError(500, "User not authorized to alter order");
+            throw createHttpError(500, "User not authorized to download orders");
         }
-
-        exec('mongoexport --uri="mongodb+srv://kamitopalyan:Kamitopalyan06@cluster0.ednxyzu.mongodb.net/test" --collection=orders --out="/MERN Websites/idealab/Test/backend/src/CSV Exports/orders.csv" --type=csv --fields=user,name,price,currency,count,countType,reason,url,notes,status,id',{shell: '/bin/bash'});
-
-        res.status(200).json("File created");
+        
+        res.status(200).download(path.join(__dirname, "..", "orders.csv"));
     } catch(error) {
         next(error);
     }
 }
+

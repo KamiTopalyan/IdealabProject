@@ -15,25 +15,37 @@ interface NavBarProps {
 const NavBar = ({ loggedInUser, onSignUpClicked, onLoginClicked, onLogoutSuccessful }: NavBarProps) => {
 
     return (
-        <Navbar className={style.navbar} variant="dark" expand="sm" sticky="top">
-            <Container>
-                <Navbar.Brand className={style.navBrand} as={Link} to="/">
-                    Order Manager
-                </Navbar.Brand>
-                <Nav.Link className={style.navlink} href="/input">
-                    Order Input
-                </Nav.Link>
-                <Navbar.Toggle aria-controls="main-navbar" />
-                <Navbar.Collapse id="main-navbar">
-                    <Nav className="ms-auto">
-                        {loggedInUser
-                            ? <NavBarLoggedInView user={loggedInUser} onLogoutSuccessful={onLogoutSuccessful}/>
-                            : <NavBarLoggedOutView onLoginClicked={onLoginClicked} onSignUpClicked={onSignUpClicked} />
-                        }
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
+      <Navbar className={style.navbar} variant="dark" expand="sm" sticky="top">
+        <Container>
+          <Navbar.Brand className={style.navBrand} as={Link} to="/">
+            Order Manager
+          </Navbar.Brand>
+          <Nav.Link className={style.navlink} href="/input">
+            Order Input
+          </Nav.Link>
+          {loggedInUser?.isAdmin ? (
+            <Nav.Link className={style.navlink} href="/download">
+                Order Download
+            </Nav.Link>
+          ) : <></>}
+          <Navbar.Toggle aria-controls="main-navbar" />
+          <Navbar.Collapse id="main-navbar">
+            <Nav className="ms-auto">
+              {loggedInUser ? (
+                <NavBarLoggedInView
+                  user={loggedInUser}
+                  onLogoutSuccessful={onLogoutSuccessful}
+                />
+              ) : (
+                <NavBarLoggedOutView
+                  onLoginClicked={onLoginClicked}
+                  onSignUpClicked={onSignUpClicked}
+                />
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
     );
 }
 

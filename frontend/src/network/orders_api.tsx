@@ -47,9 +47,17 @@ async function fetchData(endpoint: RequestInfo, method: "post" | "get" | "patch"
     }
 }
 
-export async function download() {
-    const response = await fetchData("/api/orders/download", "get");
-    return response.status;
+export interface OrderDownloadInput {
+  count: Boolean;
+  currency: Boolean;
+  dates: Boolean;
+  url: Boolean;
+  name: Boolean;
+  notes: Boolean;
+  price: Boolean;
+  reason: Boolean;
+  status: Boolean;
+  user: Boolean;
 }
 
 export async function fetchOrders(): Promise<Order[]> {
@@ -71,6 +79,41 @@ export interface OrderInput {
 export async function createOrder(order: OrderInput): Promise<Order> {
     const response = await fetchData("/api/orders", "post", order);
     return response.data;
+}
+export interface OrderDownloadFields {
+  name: Boolean;
+  price: Boolean;
+  currency: Boolean;
+  countType: Boolean;
+  count: Boolean;
+  reason: Boolean;
+  url: Boolean;
+  notes: Boolean;
+  dates: Boolean;
+}
+
+export async function generate(fields: OrderDownloadFields): Promise<Number> {
+    const selectedFields = Object.entries(fields).map(([key, value]) => {
+    if (value === true) {
+        return key;
+    }
+    return null;
+    });
+  if (selectedFields.length === 0) {
+    throw new Error("At least one field must be selected");
+  }
+  if(selectedFields.includes("count")) {
+    selectedFields.splice(selectedFields.indexOf("count")+1, 0,"countType");
+  }
+  console.log("started generating")
+  const response = await fetchData("/api/orders/generate", "post", {fields: selectedFields.filter((it) => !!it)});
+  console.log("finished generating")
+  return response.status;
+}
+
+export async function download(): Promise<any> {
+  const response = await fetchData("/api/orders/download", "get");
+  return response;
 }
 
 export async function updateOrder(orderId: string, order: OrderInput): Promise<Order> {
