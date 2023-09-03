@@ -3,24 +3,20 @@ import { User } from "../models/user";
 import axios from "axios"
 
 const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = url;
 
 async function fetchData(endpoint: string, method: "post" | "get" | "patch" | "delete", data = {}) {
     const response = await axios({
       method: method,
       url: url + endpoint,
       data: data,
-      headers: {
-        Authorization:
-          "Bearer " +
-          document.cookie
-            .split(";")
-            .find((cookie) => cookie.includes("jwt-access"))
-            ?.split("=")[1],
-      },
     });
-
+    
     if (response.status === 200 || response.status === 201) {
         return response;
+    } else if(response.status === 403) {
+      return response;
     } else {
         const errorBody = await response.data();
         const errorMessage = errorBody.error;
@@ -47,21 +43,13 @@ export interface SignUpCredentials {
 }
 
 export async function signUp(credentials: SignUpCredentials): Promise<User> {
+    const refreshTokenExp = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+    const accessTokenExp = new Date(Date.now() + 1000 * 60 * 15);
+
+    localStorage.setItem("refreshTokenExp", refreshTokenExp.toISOString());
+    localStorage.setItem("accessTokenExp", accessTokenExp.toISOString());
+
     const response = await fetchData("/api/users/signup", "post", credentials);
-
-    let d1 = new Date();
-    let d2 = new Date();
-    d1.setTime(d1.getTime() + 1000);
-    d2.setTime(d2.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    //save data to a cookie
-    document.cookie = `jwt-access=${
-      response.data.accessToken
-    };expires=${d1.toUTCString()};path=/`;
-    document.cookie = `jwt-refresh=${
-      response.data.refreshToken
-    };expires=${d2.toUTCString()};path=/`;
-    
     return response.data;
 }
 
@@ -70,53 +58,35 @@ export interface LoginCredentials {
     password: string,
 }
 
-export async function login(credentials: LoginCredentials): Promise<User> {
+export async function login(credentials: LoginCredentials): Promise<User> 
+{
+    const refreshTokenExp = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+    const accessTokenExp = new Date(Date.now() + 1000 * 60 * 15);
+
+    localStorage.setItem("refreshTokenExp", refreshTokenExp.toISOString());
+    localStorage.setItem("accessTokenExp", accessTokenExp.toISOString());
+
     const response = await fetchData("/api/users/login", "post", credentials);
-
-    let d1 = new Date();
-    let d2 = new Date();
-    d1.setTime(d1.getTime() + 15 * 60 * 1000);
-    d2.setTime(d2.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    //save data to a cookie
-    document.cookie = `jwt-access=${
-      response.data.accessToken
-    };expires=${d1.toUTCString()};path=/;httpOnly:true`;
-    document.cookie = `jwt-refresh=${
-      response.data.refreshToken
-    };expires=${d2.toUTCString()};path=/;httpOnly:true`;
-
     return response.data;
 }
 
-export async function refresh(cookie: string): Promise<User> {
-  const response = await fetchData("/api/users/refresh", "post", {
-    refreshCookie: cookie,
-  });
-
-  let d1 = new Date();
-  d1.setTime(d1.getTime() + 15 * 60 * 1000);
-
-  //save data to a cookie
-  document.cookie = `jwt-access=${response.data.accessToken};expires=${d1.toUTCString()};path=/;httpOnly:true`;
-
-
-  return response.data;
+export async function refresh(): Promise<User> {
+    const response = await axios.post("/api/users/refresh")
+    if(response.status === 200) {
+        const accessTokenExp = new Date(Date.now() + 1000 * 60 * 15);
+        localStorage.setItem("accessTokenExp", accessTokenExp.toISOString());
+    }
+    return response.data;
 }
 
 export async function logout() {
-    //delete all cookies
-    document.cookie.split(";").forEach(function (c) {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(
-            /=.*/,
-            "=;expires=" +
-              new Date().toUTCString() +
-              ";path=/;httpOnly:true"
-          );
-    });
-    
+    const response = await fetchData("/api/users/logout", "post");
+
+    if(response.status === 200) {
+        localStorage.removeItem("accessTokenExp");
+        localStorage.removeItem("refreshTokenExp");
+    }
+    return response;
 }
 
 

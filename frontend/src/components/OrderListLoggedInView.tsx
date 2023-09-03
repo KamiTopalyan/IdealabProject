@@ -25,7 +25,7 @@ const OrdersPageLoggedInView = ({ loggedInUser }: OrdersListPageProps) => {
                 setOrdersLoadingError(false);
                 OrdersLoading(true);
                 const orders = await OrdersApi.fetchOrders();
-                setOrders(orders);
+                if(orders.status === 200) setOrders(orders.data);
             } catch (error) {
                 console.error(error);
                 setOrdersLoadingError(true);

@@ -5,7 +5,7 @@ import OrderModel, { Order } from "../models/order";
 import UserModel from "../models/user";
 import { assertIsDefined } from "../util/assertIsDefined";
 import createCVSFile from "../util/createCSVFile";
-import path from "path";
+
 export const getOrders: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.body.userId;
 

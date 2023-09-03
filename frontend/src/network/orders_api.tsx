@@ -1,42 +1,41 @@
 import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Order } from "../models/order";
-import { refresh } from "./users_api";
+import { refresh, logout } from "./users_api";
 import axios from "axios"
 
 const url = process.env.NODE_ENV === 'production' ? 'http://178.244.224.244:3001' : 'http://localhost:3001';
 
-async function fetchData(endpoint: RequestInfo, method: "post" | "get" | "patch" | "delete", data?: Object) {
-    const jwtAccessCookie = document.cookie
-        .split(";")
-        .find((cookie) => cookie.includes("jwt-access"));
-
-    const jwtRefreshCookie = document.cookie
-        .split(";")
-        .find((cookie) => cookie.includes("jwt-refresh"));
-
-    if (!jwtAccessCookie && jwtRefreshCookie) {
-        await refresh(jwtRefreshCookie)
-    }
+async function fetchData(endpoint: RequestInfo, method: "post" | "get" | "patch" | "delete", data?: Object) {   
     
+    const currentTime = new Date(Date.now()).toISOString();
+    const accessTokenExp = localStorage.getItem("accessTokenExp");
+    const refreshTokenExp = localStorage.getItem("refreshTokenExp");
+
+    if (refreshTokenExp && refreshTokenExp < currentTime) {
+        console.log(await logout());
+        return {
+        status: 403,
+        data: {
+            error: "Your session has expired. Please login again.",
+        },
+        };
+    }
+
+    if (accessTokenExp && accessTokenExp < currentTime) {
+        await refresh();
+    }
+
     const response = await axios({
       method: method,
       url: url + endpoint,
       data: data,
-      headers: {
-        Authorization:
-          "Bearer " +
-          document.cookie
-            .split(";")
-            .find((cookie) => cookie.includes("jwt-access"))
-            ?.split("=")[1],
-      },
     });
     
-    if (response.status === 200 || response.status === 201) {
+
+    if (response.status === 200 || response.status === 201 || response.status === 204) {
         return response;
-    } else {
-        const errorBody = await response.data();
-        const errorMessage = errorBody.error;
+    } else {    
+        const errorMessage = response.data;
         if (response.status === 401) {
             throw new UnauthorizedError(errorMessage);
         } else if (response.status === 409) {
@@ -60,9 +59,9 @@ export interface OrderDownloadInput {
   user: Boolean;
 }
 
-export async function fetchOrders(): Promise<Order[]> {
+export async function fetchOrders(): Promise<any> {
     const response = await fetchData("/api/orders", "get");
-    return response.data;
+    return response;
 }
 
 export interface OrderInput {

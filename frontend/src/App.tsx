@@ -21,22 +21,20 @@ function App() {
 	const [showLoginModal, setShowLoginModal] = useState(false);
 
 	useEffect(() => {
-		async function refreshToken() {
+    async function checkMissingDates() {
+      try {
+        const currentTime = new Date(Date.now()).toISOString();
+        const refreshTokenExp = localStorage.getItem("refreshTokenExp");
+        const accessTokenExp = localStorage.getItem("accessTokenExp");
 
-			const jwtAccessCookie = document.cookie
-				.split(";")
-				.find((cookie) => cookie.includes("jwt-access"));
-
-			const jwtRefreshCookie = document.cookie
-				.split(";")
-				.find((cookie) => cookie.includes("jwt-refresh"));
-			
-
-			if (!jwtAccessCookie && jwtRefreshCookie) {
-				await UsersApi.refresh(jwtRefreshCookie);
-			}
-		}
-
+        if(!refreshTokenExp || !accessTokenExp) {
+          await UsersApi.logout();
+          setLoggedInUser(null);
+        }
+      } catch(error) {
+        console.error(error);
+      }
+    }
 		async function fetchLoggedInUser() {
 			try {
 				const user = await UsersApi.getLoggedInUser();
@@ -45,7 +43,7 @@ function App() {
 				console.error(error);
 			}
 		}
-		refreshToken();
+    checkMissingDates();
 		fetchLoggedInUser();
 	}, []);
 

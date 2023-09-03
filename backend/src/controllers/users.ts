@@ -75,6 +75,8 @@ export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
             env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
+        res.cookie('jwt-refresh', refreshToken, { httpOnly: true, sameSite: 'none'})
+        res.cookie('jwt-access', accessToken, { httpOnly: true, sameSite: 'none'})
 
         res.status(201).json({"accessToken": accessToken, "refreshToken": refreshToken});
     } catch (error) {
@@ -130,6 +132,8 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
         env.REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
     )
+    res.cookie('jwt-refresh', refreshToken, { httpOnly: true, sameSite: 'none', expires: new Date(Date.now() + 7*24*60*60*1000)})
+    res.cookie('jwt-access', accessToken, { httpOnly: true, sameSite: 'none', expires: new Date(Date.now() + 15*60*1000)})
 
     res.json({"accessToken": accessToken, "refreshToken": refreshToken});
 
@@ -139,10 +143,10 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
 };
 
 export const refresh: RequestHandler = (req, res, next) => {
-    const refreshToken = req.body.refreshCookie.split('=')[1];
+    const refreshToken = req.cookies['jwt-refresh']
 
     if (!refreshToken) {
-        return res.status(401).json({ message: 'Invalid credentials' })
+        throw createHttpError(401, "Invalid credentials");
     }
 
     verify(
@@ -151,13 +155,13 @@ export const refresh: RequestHandler = (req, res, next) => {
         async (err: any, decoded: any) => {
             if(err) {
                 console.log(err)
-                return res.status(403).json({ message: 'Forbidden' })
+                throw createHttpError(403, "Forbidden");
             }
 
             const user = await UserModel.findOne({ username: decoded.UserInfo.username }).exec();
 
             if (!user) {
-                return res.status(401).json({ message: 'Invalid credentials' })
+                throw createHttpError(401, "Invalid credentials");
             }
 
             const accessToken = sign(
@@ -171,7 +175,9 @@ export const refresh: RequestHandler = (req, res, next) => {
                 { expiresIn: '15m' }
             )
 
-            res.json({ accessToken })
+            res.cookie('jwt-access', accessToken, { httpOnly: true, sameSite: 'none'})
+
+            res.status(200).json({"accessToken": accessToken})
 
         }
     )
@@ -179,12 +185,13 @@ export const refresh: RequestHandler = (req, res, next) => {
 
 export const logout: RequestHandler = (req, res, next) => {
     const cookies = req.cookies
-    console.log(cookies)
-    if (!cookies?.jwt) {
+
+    if (!cookies) {
         throw createHttpError(400, "No tokens");
     }
     
     res.clearCookie('jwt-refresh', { httpOnly: true, sameSite: 'none'})
+    res.clearCookie('jwt-access', { httpOnly: true, sameSite: 'none'})
 
-    res.json({ message: 'Cookie cleared' })
+    res.status(200).json({ message: 'Cookie cleared' })
 };

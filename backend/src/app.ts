@@ -15,7 +15,8 @@ import path from "path"
 
 const options: cors.CorsOptions = {
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    origin: "http://localhost:3000"
 };
 
 const app = express();
